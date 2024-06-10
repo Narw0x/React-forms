@@ -1,45 +1,36 @@
-import { useState } from 'react';
 import Input from './Input';
 import { isEmail, isNotEmpty, hasMinLength } from '../util/validation';
+import { useInput } from '../hooks/useInput';
 
 export default function Login() {
-  const [values, setValues] = useState({
-    email: '',
-    password: ''
-  });
 
-  const [didEdit, setDidEdit] = useState({
-    email: false,
-    password: false
-  });
+  const {
+    value : email,
+    handleChange : handleChangeEmail,
+    handleBlur : handleBlurEmail,
+    hasError : emailIsInvalid
 
-  const emailIsInvalid = didEdit.email && !isEmail(values.email) && !isNotEmpty(values.email);
-  const passwordIsInvalid = didEdit.password && !hasMinLength(values.password, 6);
+  } = useInput('', (value) => isEmail(value) && isNotEmpty(value));
+
+  const {
+    value : password,
+    handleChange : handleChangePassword,
+    handleBlur : handleBlurPassword,
+    hasError : passwordIsInvalid
+  } = useInput('', (value) => hasMinLength(value, 6));
+
 
   function handleSubmit(event){
     event.preventDefault();
+
+    if(emailIsInvalid || passwordIsInvalid){
+      return;
+    }
+
+    console.log(email, password);
   }
 
-  function handleChange(event){
-    const { name, value } = event.target;
-    setDidEdit({
-      ...didEdit,
-      [name]: false
-    });
-
-    setValues({
-      ...values,
-      [name]: value
-    });
-  }
-
-  function handleBlur(event){
-    const { name } = event.target;
-    setDidEdit({
-      ...didEdit,
-      [name]: true
-    });
-  }
+  
 
   return (
     <form onSubmit={handleSubmit}>
@@ -52,9 +43,9 @@ export default function Login() {
           name="email"
           type="email"
           error={emailIsInvalid && 'Please enter a valid email'}
-          value={values.email}
-          onChange={handleChange}
-          onBlur={handleBlur}
+          value={email}
+          onChange={handleChangeEmail}
+          onBlur={handleBlurEmail}
         />
 
         <Input
@@ -63,9 +54,9 @@ export default function Login() {
           name="password"
           type="password"
           error={passwordIsInvalid && 'Password must be at least 6 characters long'}
-          value={values.password}
-          onChange={handleChange}
-          onBlur={handleBlur}
+          value={password}
+          onChange={handleChangePassword}
+          onBlur={handleBlurPassword}
         />
       </div>
 
